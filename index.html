@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swaroop | Blog & Thoughts</title>
+    <meta name="description" content="Swaroop's personal blog — tech insights, programming tutorials, and personal reflections.">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>S</text></svg>">
+</head>
+<body>
+    <header class="site-header">
+        <nav class="nav-container">
+            <a href="/" class="logo">swaroop<span class="dot">.in</span></a>
+            <ul class="nav-links">
+                <li><a href="#blog" class="active">Blog</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <span class="icon-sun">&#9788;</span>
+                <span class="icon-moon">&#9790;</span>
+            </button>
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <p class="hero-greeting">Hey, I'm</p>
+                <h1 class="hero-name">Swaroop</h1>
+                <p class="hero-tagline">I write about <span class="typed" id="typed"></span><span class="cursor">|</span></p>
+                <p class="hero-description">
+                    Developer, thinker, and occasional writer. I explore the intersection of
+                    technology and everyday life through code and words.
+                </p>
+                <div class="hero-actions">
+                    <a href="#blog" class="btn btn-primary">Read the Blog</a>
+                    <a href="#about" class="btn btn-secondary">About Me</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Blog Section -->
+        <section id="blog" class="section blog-section">
+            <div class="container">
+                <h2 class="section-title">Latest Posts</h2>
+                <div class="blog-grid">
+                    <article class="blog-card featured">
+                        <div class="card-tag">Featured</div>
+                        <div class="card-content">
+                            <div class="card-meta">
+                                <span class="card-date">Mar 10, 2026</span>
+                                <span class="card-category">Tech</span>
+                            </div>
+                            <h3><a href="#">Building a Second Brain with Plain Text Files</a></h3>
+                            <p>How I replaced complex note-taking apps with a simple system of markdown files, shell scripts, and git. Sometimes the best tools are the ones you already have.</p>
+                            <a href="#" class="read-more">Read more &rarr;</a>
+                        </div>
+                    </article>
+
+                    <article class="blog-card">
+                        <div class="card-content">
+                            <div class="card-meta">
+                                <span class="card-date">Mar 5, 2026</span>
+                                <span class="card-category">Personal</span>
+                            </div>
+                            <h3><a href="#">The Art of Doing Nothing (Productively)</a></h3>
+                            <p>Why stepping away from the screen is the most underrated productivity hack for developers.</p>
+                            <a href="#" class="read-more">Read more &rarr;</a>
+                        </div>
+                    </article>
+
+                    <article class="blog-card">
+                        <div class="card-content">
+                            <div class="card-meta">
+                                <span class="card-date">Feb 28, 2026</span>
+                                <span class="card-category">Tech</span>
+                            </div>
+                            <h3><a href="#">Demystifying WebAssembly for Web Developers</a></h3>
+                            <p>A practical guide to understanding when and why you'd want to use WebAssembly in your projects.</p>
+                            <a href="#" class="read-more">Read more &rarr;</a>
+                        </div>
+                    </article>
+
+                    <article class="blog-card">
+                        <div class="card-content">
+                            <div class="card-meta">
+                                <span class="card-date">Feb 20, 2026</span>
+                                <span class="card-category">Personal</span>
+                            </div>
+                            <h3><a href="#">Lessons from Teaching My First Workshop</a></h3>
+                            <p>What I learned about communication, patience, and the curse of knowledge when I taught a Python workshop.</p>
+                            <a href="#" class="read-more">Read more &rarr;</a>
+                        </div>
+                    </article>
+
+                    <article class="blog-card">
+                        <div class="card-content">
+                            <div class="card-meta">
+                                <span class="card-date">Feb 12, 2026</span>
+                                <span class="card-category">Tech</span>
+                            </div>
+                            <h3><a href="#">Terminal Tools That Changed My Workflow</a></h3>
+                            <p>A curated list of CLI tools that I use daily and how they've made me a more efficient developer.</p>
+                            <a href="#" class="read-more">Read more &rarr;</a>
+                        </div>
+                    </article>
+
+                    <article class="blog-card">
+                        <div class="card-content">
+                            <div class="card-meta">
+                                <span class="card-date">Feb 5, 2026</span>
+                                <span class="card-category">Personal</span>
+                            </div>
+                            <h3><a href="#">On Reading More and Scrolling Less</a></h3>
+                            <p>My experiment with replacing social media time with books, and what happened after 30 days.</p>
+                            <a href="#" class="read-more">Read more &rarr;</a>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="section about-section">
+            <div class="container">
+                <h2 class="section-title">About Me</h2>
+                <div class="about-content">
+                    <div class="about-text">
+                        <p>
+                            Hi! I'm Swaroop &mdash; a developer who loves building things and writing about the journey.
+                            I'm passionate about clean code, open source, and making technology more accessible.
+                        </p>
+                        <p>
+                            When I'm not coding, you'll find me reading, exploring new places, or experimenting
+                            with ideas that sit at the crossroads of tech and life.
+                        </p>
+                        <p>
+                            This blog is my space to share what I learn, think, and build. Whether it's a deep-dive
+                            into a technical topic or a reflection on life as a developer, I hope you find something
+                            useful here.
+                        </p>
+                        <div class="about-links">
+                            <a href="https://github.com" class="social-link" target="_blank" rel="noopener">GitHub</a>
+                            <a href="https://twitter.com" class="social-link" target="_blank" rel="noopener">Twitter</a>
+                            <a href="https://linkedin.com" class="social-link" target="_blank" rel="noopener">LinkedIn</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="section contact-section">
+            <div class="container">
+                <h2 class="section-title">Get in Touch</h2>
+                <div class="contact-content">
+                    <p>Have a question, feedback, or just want to say hi? Drop me a message.</p>
+                    <form class="contact-form" id="contactForm">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" name="message" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; 2026 Swaroop. Built with curiosity and caffeine.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
