@@ -1,0 +1,17 @@
+# Credentials & secrets
+.env
+.retool_token_cache.json
+
+# Data & logs (large/generated files)
+data/
+logs/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
