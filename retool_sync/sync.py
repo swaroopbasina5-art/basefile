@@ -106,6 +106,7 @@ class RetoolDataSync:
         self,
         target_date: date | None = None,
         fmt: str = "both",
+        columns: list[str] | None = None,
         **kwargs,
     ) -> dict[str, Path]:
         """Fetch orders and persist to disk. Returns paths of saved files.
@@ -113,11 +114,22 @@ class RetoolDataSync:
         Args:
             target_date: Date to fetch (default: yesterday).
             fmt: "json", "csv", or "both".
+            columns: If set, only keep these columns in the output.
         """
         if target_date is None:
             target_date = date.today() - timedelta(days=1)
 
         rows = self.fetch_orders(target_date=target_date, **kwargs)
+
+        # Filter to requested columns only
+        if columns and rows:
+            available = set(rows[0].keys())
+            missing = [c for c in columns if c not in available]
+            if missing:
+                logger.warning("Columns not found in data (skipped): %s", missing)
+            keep = [c for c in columns if c in available]
+            rows = [{k: row[k] for k in keep} for row in rows]
+            logger.info("Filtered to %d columns: %s", len(keep), keep)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         date_str = target_date.isoformat()
         saved: dict[str, Path] = {}

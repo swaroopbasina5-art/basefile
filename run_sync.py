@@ -46,6 +46,7 @@ def main():
     parser.add_argument("--from-date", type=_parse_date, help="Start of date range")
     parser.add_argument("--to-date", type=_parse_date, help="End of date range (inclusive)")
     parser.add_argument("--format", choices=["json", "csv", "both"], default="both", help="Output format")
+    parser.add_argument("--columns", nargs="+", help="Only include these columns (e.g. --columns rider_name rider_number store_name)")
     parser.add_argument("--daemon", action="store_true", help="Run as scheduled daemon")
     args = parser.parse_args()
 
@@ -63,14 +64,14 @@ def main():
         current = args.from_date
         while current <= args.to_date:
             logger.info("--- Syncing %s ---", current.isoformat())
-            saved = syncer.fetch_and_save(target_date=current, fmt=args.format)
+            saved = syncer.fetch_and_save(target_date=current, fmt=args.format, columns=args.columns)
             for fmt, path in saved.items():
                 print(f"  {fmt}: {path}")
             current += timedelta(days=1)
     else:
         target = args.date or (date.today() - timedelta(days=1))
         logger.info("Syncing %s …", target.isoformat())
-        saved = syncer.fetch_and_save(target_date=target, fmt=args.format)
+        saved = syncer.fetch_and_save(target_date=target, fmt=args.format, columns=args.columns)
         for fmt, path in saved.items():
             print(f"  {fmt}: {path}")
 
