@@ -34,40 +34,50 @@ class RetoolAuth:
         return self.session
 
     def login(self) -> None:
-        """Authenticate against Retool and store session cookies."""
+        """Authenticate against Retool (two-step: login → saveAuth)."""
         logger.info("Logging in to Retool as %s …", RETOOL_EMAIL)
 
-        payload = {"email": RETOOL_EMAIL, "password": RETOOL_PASSWORD}
         headers = {
             "Content-Type": "application/json",
             "Origin": RETOOL_BASE_URL,
             "Referer": f"{RETOOL_BASE_URL}/auth/login",
         }
 
+        # Step 1: POST /api/login → get authorizationToken + authUrl
         resp = self._request_with_retry(
-            "POST", LOGIN_URL, json=payload, headers=headers
+            "POST", LOGIN_URL,
+            json={"email": RETOOL_EMAIL, "password": RETOOL_PASSWORD},
+            headers=headers,
         )
         resp.raise_for_status()
+        body = resp.json()
 
-        # Extract tokens from response cookies
+        auth_url = body.get("authUrl")
+        auth_token = body.get("authorizationToken")
+
+        if not auth_url or not auth_token:
+            raise RuntimeError(
+                "Login response missing authUrl/authorizationToken. "
+                "Keys received: %s" % list(body.keys())
+            )
+
+        # Step 2: POST authUrl with the token → session cookies are set
+        resp2 = self._request_with_retry(
+            "POST", auth_url,
+            json={"authorizationToken": auth_token},
+            headers=headers,
+        )
+        resp2.raise_for_status()
+
+        # Extract tokens from session cookies
         cookies = self.session.cookies.get_dict()
         self.access_token = cookies.get("accessToken")
         self.xsrf_token = cookies.get("xsrfToken")
 
-        # Also check the response body for tokens
-        try:
-            body = resp.json()
-            if "accessToken" in body:
-                self.access_token = body["accessToken"]
-            if "xsrfToken" in body:
-                self.xsrf_token = body["xsrfToken"]
-        except (ValueError, KeyError):
-            pass
-
         if not self.access_token:
             raise RuntimeError(
-                "Login succeeded (HTTP %s) but no accessToken found in "
-                "cookies or response body." % resp.status_code
+                "saveAuth succeeded but no accessToken cookie found. "
+                "Cookies: %s" % list(cookies.keys())
             )
 
         self._save_cached_token()
@@ -107,10 +117,15 @@ class RetoolAuth:
         return self.session.request(method, url, timeout=30, **kwargs)
 
     def _save_cached_token(self) -> None:
+        # Use items() to handle duplicate cookie names safely
+        cookie_list = [
+            {"name": c.name, "value": c.value, "domain": c.domain, "path": c.path}
+            for c in self.session.cookies
+        ]
         data = {
             "access_token": self.access_token,
             "xsrf_token": self.xsrf_token,
-            "cookies": dict(self.session.cookies),
+            "cookies": cookie_list,
         }
         TOKEN_CACHE_FILE.write_text(json.dumps(data))
 
@@ -121,8 +136,15 @@ class RetoolAuth:
             data = json.loads(TOKEN_CACHE_FILE.read_text())
             self.access_token = data.get("access_token")
             self.xsrf_token = data.get("xsrf_token")
-            for name, value in data.get("cookies", {}).items():
-                self.session.cookies.set(name, value)
+            for c in data.get("cookies", []):
+                if isinstance(c, dict):
+                    self.session.cookies.set(
+                        c["name"], c["value"],
+                        domain=c.get("domain", ""), path=c.get("path", "/"),
+                    )
+                else:
+                    # Legacy format: plain dict
+                    pass
             logger.info("Loaded cached tokens.")
         except (json.JSONDecodeError, KeyError):
             logger.warning("Token cache corrupted – will re-login.")

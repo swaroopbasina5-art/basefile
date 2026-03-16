@@ -91,10 +91,13 @@ class RetoolDataSync:
                 QUERY_URL, params=params, headers=headers, json=payload, timeout=60
             )
 
-        resp.raise_for_status()
+        # Retool returns 400 for query timeouts – check before raising
         data = resp.json()
+        if resp.status_code == 400 and data.get("error"):
+            logger.error("Retool query error (HTTP 400): %s", data.get("message"))
+            return []
+        resp.raise_for_status()
 
-        # Retool wraps query results differently; try common shapes
         rows = self._extract_rows(data)
         logger.info("Fetched %d order rows.", len(rows))
         return rows
@@ -142,25 +145,42 @@ class RetoolDataSync:
 
     @staticmethod
     def _extract_rows(data: dict) -> list[dict]:
-        """Navigate Retool's response envelope to find the result rows."""
-        # Shape 1: {"data": [...]}
+        """Navigate Retool's response and convert to row-oriented dicts.
+
+        Retool returns column-oriented data like:
+            {"order_id": ["A", "B"], "status": ["X", "Y"]}
+        We convert to:
+            [{"order_id": "A", "status": "X"}, {"order_id": "B", "status": "Y"}]
+        """
+        # Check for query errors
+        if data.get("error"):
+            msg = data.get("message", "Unknown query error")
+            logger.error("Retool query error: %s", msg)
+            return []
+
+        # Retool returns column-oriented dict at top level
+        # Detect: all top-level values are lists of the same length
+        if isinstance(data, dict) and data:
+            values = list(data.values())
+            if all(isinstance(v, list) for v in values):
+                lengths = {len(v) for v in values}
+                if len(lengths) == 1:
+                    n = lengths.pop()
+                    keys = list(data.keys())
+                    return [{k: data[k][i] for k in keys} for i in range(n)]
+
+        # Fallback: row-oriented shapes
         if isinstance(data.get("data"), list):
             return data["data"]
-        # Shape 2: {"data": {"data": [...]}}
         if isinstance(data.get("data"), dict):
             inner = data["data"]
             if isinstance(inner.get("data"), list):
                 return inner["data"]
             if isinstance(inner.get("rows"), list):
                 return inner["rows"]
-        # Shape 3: {"queryResult": {"data": [...]}}
-        qr = data.get("queryResult", {})
-        if isinstance(qr.get("data"), list):
-            return qr["data"]
-        # Shape 4: top-level list
         if isinstance(data, list):
             return data
-        # Fallback – return raw as single-item list for inspection
+
         logger.warning("Unexpected response shape – saving raw payload.")
         return [data]
 
