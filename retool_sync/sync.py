@@ -3,9 +3,12 @@
 import csv
 import json
 import logging
+import time
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any
+
+import requests
 
 from .auth import RetoolAuth
 from .config import (
@@ -78,29 +81,44 @@ class RetoolDataSync:
             len(store_ids),
         )
 
-        resp = session.post(
-            QUERY_URL, params=params, headers=headers, json=payload, timeout=60
-        )
+        # Retry on network errors (chunked encoding, connection reset, etc.)
+        max_retries = 4
+        for attempt in range(max_retries + 1):
+            try:
+                resp = session.post(
+                    QUERY_URL, params=params, headers=headers, json=payload, timeout=120
+                )
 
-        if resp.status_code == 401:
-            logger.warning("Got 401 – re-authenticating and retrying …")
-            self.auth.login()
-            headers["x-xsrf-token"] = self.auth.xsrf_token
-            session = self.auth.get_session()
-            resp = session.post(
-                QUERY_URL, params=params, headers=headers, json=payload, timeout=60
-            )
+                if resp.status_code == 401:
+                    logger.warning("Got 401 – re-authenticating and retrying …")
+                    self.auth.login()
+                    headers["x-xsrf-token"] = self.auth.xsrf_token
+                    session = self.auth.get_session()
+                    continue
 
-        # Retool returns 400 for query timeouts – check before raising
-        data = resp.json()
-        if resp.status_code == 400 and data.get("error"):
-            logger.error("Retool query error (HTTP 400): %s", data.get("message"))
-            return []
-        resp.raise_for_status()
+                # Retool returns 400 for query timeouts
+                data = resp.json()
+                if resp.status_code == 400 and data.get("error"):
+                    logger.error("Retool query error (HTTP 400): %s", data.get("message"))
+                    return []
+                resp.raise_for_status()
 
-        rows = self._extract_rows(data)
-        logger.info("Fetched %d order rows.", len(rows))
-        return rows
+                rows = self._extract_rows(data)
+                logger.info("Fetched %d order rows.", len(rows))
+                return rows
+
+            except (requests.ConnectionError, requests.ChunkedEncodingError) as exc:
+                if attempt < max_retries:
+                    wait = 2 ** (attempt + 1)
+                    logger.warning(
+                        "Network error (attempt %d/%d): %s – retrying in %ds",
+                        attempt + 1, max_retries, type(exc).__name__, wait,
+                    )
+                    time.sleep(wait)
+                else:
+                    raise
+
+        return []
 
     def fetch_and_save(
         self,
