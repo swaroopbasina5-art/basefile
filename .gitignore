@@ -1,0 +1,17 @@
+# Environment
+.env
+.venv/
+venv/
+__pycache__/
+
+# Google credentials (NEVER commit these)
+credentials.json
+token.json
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
