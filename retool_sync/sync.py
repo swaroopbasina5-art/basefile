@@ -13,11 +13,11 @@ import requests
 from .auth import RetoolAuth
 from .config import (
     DATA_DIR,
-    DEFAULT_CITY_ID,
+    DEFAULT_CITY,
     DEFAULT_CLIENT_ID,
-    DEFAULT_STORE_IDS,
     QUERY_URL,
     RETOOL_QUERY_NAME,
+    get_city_config,
 )
 
 logger = logging.getLogger(__name__)
@@ -36,8 +36,9 @@ class RetoolDataSync:
     def fetch_orders(
         self,
         target_date: date | None = None,
+        city: str = DEFAULT_CITY,
         client_id: int = DEFAULT_CLIENT_ID,
-        city_id: int = DEFAULT_CITY_ID,
+        city_id: int | None = None,
         store_ids: list[int] | None = None,
         include_bto: bool = True,
         order_id_filter: str = "",
@@ -46,7 +47,13 @@ class RetoolDataSync:
         if target_date is None:
             target_date = date.today() - timedelta(days=1)
 
-        store_ids = store_ids or DEFAULT_STORE_IDS
+        cfg = get_city_config(city)
+        city_id = city_id or cfg["city_id"]
+        if city_id is None:
+            raise ValueError(f"city_id not configured for '{city}'. Update CITY_CONFIG in config.py.")
+        store_ids = store_ids or sorted(cfg["store_name_map"].values())
+        if not store_ids:
+            raise ValueError(f"No store IDs configured for '{city}'. Update CITY_CONFIG in config.py.")
         next_date = target_date + timedelta(days=1)
 
         payload = {
@@ -123,6 +130,7 @@ class RetoolDataSync:
     def fetch_and_save(
         self,
         target_date: date | None = None,
+        city: str = DEFAULT_CITY,
         fmt: str = "both",
         columns: list[str] | None = None,
         **kwargs,
@@ -131,13 +139,14 @@ class RetoolDataSync:
 
         Args:
             target_date: Date to fetch (default: yesterday).
+            city: City key (blr, mumbai, pune).
             fmt: "json", "csv", or "both".
             columns: If set, only keep these columns in the output.
         """
         if target_date is None:
             target_date = date.today() - timedelta(days=1)
 
-        rows = self.fetch_orders(target_date=target_date, **kwargs)
+        rows = self.fetch_orders(target_date=target_date, city=city, **kwargs)
 
         # Filter to requested columns only
         if columns and rows:
@@ -150,16 +159,17 @@ class RetoolDataSync:
             logger.info("Filtered to %d columns: %s", len(keep), keep)
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         date_str = target_date.isoformat()
+        city_lower = city.lower()
         saved: dict[str, Path] = {}
 
         if fmt in ("json", "both"):
-            path = DATA_DIR / f"orders_{date_str}_{timestamp}.json"
+            path = DATA_DIR / f"orders_{city_lower}_{date_str}_{timestamp}.json"
             path.write_text(json.dumps(rows, indent=2, default=str))
             saved["json"] = path
             logger.info("Saved JSON → %s", path)
 
         if fmt in ("csv", "both") and rows:
-            path = DATA_DIR / f"orders_{date_str}_{timestamp}.csv"
+            path = DATA_DIR / f"orders_{city_lower}_{date_str}_{timestamp}.csv"
             self._write_csv(rows, path)
             saved["csv"] = path
             logger.info("Saved CSV  → %s", path)

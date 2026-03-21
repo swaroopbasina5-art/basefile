@@ -23,7 +23,7 @@ import logging
 import sys
 from datetime import date, datetime, timedelta
 
-from retool_sync.config import LOG_DIR, LOG_LEVEL
+from retool_sync.config import CITY_CONFIG, DEFAULT_CITY, LOG_DIR, LOG_LEVEL
 from retool_sync.sync import RetoolDataSync
 
 
@@ -46,6 +46,7 @@ def main():
     parser.add_argument("--from-date", type=_parse_date, help="Start of date range")
     parser.add_argument("--to-date", type=_parse_date, help="End of date range (inclusive)")
     parser.add_argument("--format", choices=["json", "csv", "both"], default="both", help="Output format")
+    parser.add_argument("--city", choices=list(CITY_CONFIG.keys()), default=DEFAULT_CITY, help="City to fetch data for (default: blr)")
     parser.add_argument("--columns", nargs="+", help="Only include these columns (e.g. --columns rider_name rider_number store_name)")
     parser.add_argument("--daemon", action="store_true", help="Run as scheduled daemon")
     args = parser.parse_args()
@@ -63,15 +64,15 @@ def main():
     if args.from_date and args.to_date:
         current = args.from_date
         while current <= args.to_date:
-            logger.info("--- Syncing %s ---", current.isoformat())
-            saved = syncer.fetch_and_save(target_date=current, fmt=args.format, columns=args.columns)
+            logger.info("--- Syncing %s [%s] ---", current.isoformat(), args.city)
+            saved = syncer.fetch_and_save(target_date=current, city=args.city, fmt=args.format, columns=args.columns)
             for fmt, path in saved.items():
                 print(f"  {fmt}: {path}")
             current += timedelta(days=1)
     else:
         target = args.date or (date.today() - timedelta(days=1))
-        logger.info("Syncing %s …", target.isoformat())
-        saved = syncer.fetch_and_save(target_date=target, fmt=args.format, columns=args.columns)
+        logger.info("Syncing %s [%s] …", target.isoformat(), args.city)
+        saved = syncer.fetch_and_save(target_date=target, city=args.city, fmt=args.format, columns=args.columns)
         for fmt, path in saved.items():
             print(f"  {fmt}: {path}")
 
