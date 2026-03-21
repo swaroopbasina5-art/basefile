@@ -33,6 +33,9 @@ class RetoolDataSync:
     # Public API
     # ------------------------------------------------------------------
 
+    # Maximum stores per batch to avoid Retool query timeouts (10s server-side).
+    STORE_BATCH_SIZE = 10
+
     def fetch_orders(
         self,
         target_date: date | None = None,
@@ -54,8 +57,40 @@ class RetoolDataSync:
         store_ids = store_ids or sorted(cfg["store_name_map"].values())
         if not store_ids:
             raise ValueError(f"No store IDs configured for '{city}'. Update CITY_CONFIG in config.py.")
-        next_date = target_date + timedelta(days=1)
 
+        # Batch stores to stay within Retool's 10s query timeout
+        batches = [
+            store_ids[i : i + self.STORE_BATCH_SIZE]
+            for i in range(0, len(store_ids), self.STORE_BATCH_SIZE)
+        ]
+
+        logger.info(
+            "Fetching orders for %s (client=%s, city=%s, stores=%d in %d batches) …",
+            target_date.isoformat(), client_id, city_id, len(store_ids), len(batches),
+        )
+
+        all_rows: list[dict[str, Any]] = []
+        for batch_idx, batch in enumerate(batches, 1):
+            logger.info("  Batch %d/%d (%d stores) …", batch_idx, len(batches), len(batch))
+            rows = self._fetch_store_batch(
+                target_date, client_id, city_id, batch, include_bto, order_id_filter,
+            )
+            all_rows.extend(rows)
+
+        logger.info("Fetched %d total order rows.", len(all_rows))
+        return all_rows
+
+    def _fetch_store_batch(
+        self,
+        target_date: date,
+        client_id: int,
+        city_id: int,
+        store_ids: list[int],
+        include_bto: bool,
+        order_id_filter: str,
+    ) -> list[dict[str, Any]]:
+        """Fetch a single batch of stores (kept small to avoid timeouts)."""
+        next_date = target_date + timedelta(days=1)
         payload = {
             "userParams": {
                 "queryParams": {
@@ -80,15 +115,6 @@ class RetoolDataSync:
         }
         params = {"queryName": RETOOL_QUERY_NAME}
 
-        logger.info(
-            "Fetching orders for %s (client=%s, city=%s, stores=%d) …",
-            target_date.isoformat(),
-            client_id,
-            city_id,
-            len(store_ids),
-        )
-
-        # Retry on network errors (chunked encoding, connection reset, etc.)
         max_retries = 4
         for attempt in range(max_retries + 1):
             try:
@@ -103,7 +129,6 @@ class RetoolDataSync:
                     session = self.auth.get_session()
                     continue
 
-                # Retool returns 400 for query timeouts
                 data = resp.json()
                 if resp.status_code == 400 and data.get("error"):
                     logger.error("Retool query error (HTTP 400): %s", data.get("message"))
@@ -111,7 +136,7 @@ class RetoolDataSync:
                 resp.raise_for_status()
 
                 rows = self._extract_rows(data)
-                logger.info("Fetched %d order rows.", len(rows))
+                logger.info("    → %d rows", len(rows))
                 return rows
 
             except (requests.ConnectionError, requests.ChunkedEncodingError) as exc:
