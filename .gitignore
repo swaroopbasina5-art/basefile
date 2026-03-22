@@ -2,8 +2,7 @@
 .env
 .retool_token_cache.json
 
-# Data & logs (large/generated files)
-data/
+# Logs (generated files)
 logs/
 
 # Python
