@@ -2,6 +2,10 @@
 .env
 .retool_token_cache.json
 
+# Large JSON files (exceed GitHub 100MB limit)
+data/orders_2026-03-16_20260317_163811.json
+data/orders_2026-03-16_20260317_163913.json
+
 # Logs (generated files)
 logs/
 
