@@ -1,0 +1,99 @@
+{
+  "priceTriggers": [
+    {
+      "symbol": "RELIANCE",
+      "type": "above",
+      "price": 2800,
+      "action": "sell_signal",
+      "message": "Reliance crossed above target price - consider booking profits"
+    },
+    {
+      "symbol": "RELIANCE",
+      "type": "below",
+      "price": 2200,
+      "action": "buy_signal",
+      "message": "Reliance dropped below buy zone - consider accumulating"
+    },
+    {
+      "symbol": "TCS",
+      "type": "above",
+      "price": 4200,
+      "action": "sell_signal",
+      "message": "TCS crossed above target - consider partial exit"
+    },
+    {
+      "symbol": "HDFCBANK",
+      "type": "below",
+      "price": 1500,
+      "action": "buy_signal",
+      "message": "HDFC Bank in buy zone - consider adding"
+    }
+  ],
+  "percentChangeTriggers": [
+    {
+      "symbol": "ALL",
+      "period": "daily",
+      "changePercent": 5,
+      "direction": "drop",
+      "action": "alert",
+      "message": "dropped more than 5% today"
+    },
+    {
+      "symbol": "ALL",
+      "period": "daily",
+      "changePercent": 5,
+      "direction": "rise",
+      "action": "alert",
+      "message": "rose more than 5% today"
+    },
+    {
+      "symbol": "ALL",
+      "period": "weekly",
+      "changePercent": 10,
+      "direction": "drop",
+      "action": "buy_signal",
+      "message": "dropped more than 10% this week - potential buying opportunity"
+    }
+  ],
+  "technicalTriggers": [
+    {
+      "symbol": "ALL",
+      "indicator": "RSI",
+      "params": { "period": 14 },
+      "condition": "below",
+      "threshold": 30,
+      "action": "buy_signal",
+      "message": "RSI oversold - potential reversal ahead"
+    },
+    {
+      "symbol": "ALL",
+      "indicator": "RSI",
+      "params": { "period": 14 },
+      "condition": "above",
+      "threshold": 70,
+      "action": "sell_signal",
+      "message": "RSI overbought - consider taking profits"
+    },
+    {
+      "symbol": "ALL",
+      "indicator": "SMA_CROSSOVER",
+      "params": { "shortPeriod": 20, "longPeriod": 50 },
+      "condition": "bullish_crossover",
+      "action": "buy_signal",
+      "message": "Golden crossover (20 SMA crossed above 50 SMA) - bullish signal"
+    },
+    {
+      "symbol": "ALL",
+      "indicator": "SMA_CROSSOVER",
+      "params": { "shortPeriod": 20, "longPeriod": 50 },
+      "condition": "bearish_crossover",
+      "action": "sell_signal",
+      "message": "Death crossover (20 SMA crossed below 50 SMA) - bearish signal"
+    }
+  ],
+  "rebalanceTrigger": {
+    "enabled": true,
+    "deviationThreshold": 5,
+    "message": "Portfolio weights have drifted beyond threshold - rebalancing suggested"
+  }
+}
