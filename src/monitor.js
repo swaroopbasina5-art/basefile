@@ -15,7 +15,9 @@ const {
   formatPercentChangeEmail,
   formatTechnicalEmail,
   formatRebalanceEmail,
+  formatIntelligenceEmail,
 } = require('./emailService');
+const { generateIntelligenceReport } = require('./marketIntelligence');
 
 const portfolioPath = path.resolve(
   process.env.PORTFOLIO_CONFIG || 'config/portfolio.json'
@@ -145,6 +147,34 @@ async function runMonitorCycle() {
           await sendAlert({
             subject: 'Portfolio Rebalance Suggested',
             body: formatRebalanceEmail(rebalanceSuggestions),
+          });
+        }
+      }
+    }
+
+    // 5. Market Intelligence Report (runs once daily at first cycle)
+    const intelKey = triggerKey('intelligence', 'portfolio', 'daily');
+    if (!isAlreadyFired(intelKey)) {
+      markFired(intelKey);
+      console.log('Generating market intelligence reports...');
+      const intelReports = [];
+      for (const symbol of symbols) {
+        const history = historicalDataMap[symbol];
+        if (history && history.length >= 20) {
+          intelReports.push(generateIntelligenceReport(symbol, history));
+        }
+      }
+
+      if (intelReports.length > 0) {
+        const actionable = intelReports.filter(
+          (r) => r.intelligence && Math.abs(r.intelligence.score) >= 15
+        );
+
+        if (actionable.length > 0) {
+          console.log(`  ${actionable.length} stocks with actionable intelligence signals`);
+          await sendAlert({
+            subject: `Daily Intelligence: ${actionable.length} actionable signals`,
+            body: formatIntelligenceEmail(actionable),
           });
         }
       }
