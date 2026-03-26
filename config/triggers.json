@@ -1,99 +1,201 @@
 {
   "priceTriggers": [
     {
-      "symbol": "RELIANCE",
-      "type": "above",
-      "price": 2800,
-      "action": "sell_signal",
-      "message": "Reliance crossed above target price - consider booking profits"
+      "_comment": "=== BIG WINNERS - Profit Booking Triggers ===",
+      "symbol": "M&M", "type": "above", "price": 3500,
+      "action": "sell_signal", "message": "M&M at 400%+ gains - strongly consider booking partial profits"
     },
     {
-      "symbol": "RELIANCE",
-      "type": "below",
-      "price": 2200,
-      "action": "buy_signal",
-      "message": "Reliance dropped below buy zone - consider accumulating"
+      "symbol": "TATAMOTORS", "type": "above", "price": 500,
+      "action": "sell_signal", "message": "Tata Motors Commercial at 270%+ gains - consider profit booking"
     },
     {
-      "symbol": "TCS",
-      "type": "above",
-      "price": 4200,
-      "action": "sell_signal",
-      "message": "TCS crossed above target - consider partial exit"
+      "symbol": "CRAFTSMAN", "type": "above", "price": 8000,
+      "action": "sell_signal", "message": "Craftsman Automation at 160%+ gains - consider partial exit"
     },
     {
-      "symbol": "HDFCBANK",
-      "type": "below",
-      "price": 1500,
-      "action": "buy_signal",
-      "message": "HDFC Bank in buy zone - consider adding"
+      "symbol": "STLTECH", "type": "above", "price": 220,
+      "action": "sell_signal", "message": "Sterlite Tech at 220%+ gains - consider booking profits"
+    },
+    {
+      "symbol": "REGENCYFIN", "type": "above", "price": 32,
+      "action": "sell_signal", "message": "Regency Fincorp at 210%+ gains - consider profit booking"
+    },
+    {
+      "symbol": "KINETICENG", "type": "above", "price": 260,
+      "action": "sell_signal", "message": "Kinetic Engineering doubled+ - consider partial exit"
+    },
+    {
+      "symbol": "SGBJUN29", "type": "above", "price": 16000,
+      "action": "sell_signal", "message": "Gold Bond at 170%+ gains - review if holding till maturity"
+    },
+    {
+      "symbol": "PARADEEP", "type": "above", "price": 130,
+      "action": "sell_signal", "message": "Paradeep Phosphates at 95%+ gains - consider partial exit"
+    },
+    {
+      "symbol": "NYKAA", "type": "above", "price": 280,
+      "action": "sell_signal", "message": "Nykaa at 88%+ gains - consider partial profit booking"
+    },
+    {
+      "symbol": "ABSLLIFE", "type": "above", "price": 110,
+      "action": "sell_signal", "message": "Aditya Birla Lifestyle doubled - consider partial exit"
+    },
+
+    {
+      "_comment": "=== HEAVY LOSERS - Stop Loss & Recovery Triggers ===",
+      "symbol": "SAKUMA", "type": "below", "price": 1.0,
+      "action": "alert", "message": "CRITICAL: Sakuma Exports near zero (78% loss) - review for exit"
+    },
+    {
+      "symbol": "STLNET", "type": "below", "price": 15,
+      "action": "alert", "message": "STL Networks down 80% - consider exiting to limit losses"
+    },
+    {
+      "symbol": "NAGARFERT", "type": "below", "price": 3.0,
+      "action": "alert", "message": "Nagarjuna Fertilizer down 72% - review for exit"
+    },
+    {
+      "symbol": "MANYAVAR", "type": "below", "price": 300,
+      "action": "alert", "message": "Vedant Fashions down 73% - consider stop loss"
+    },
+    {
+      "symbol": "EASEMYTRIP", "type": "below", "price": 5.0,
+      "action": "alert", "message": "EaseMyTrip down 66%+ - review holding"
+    },
+    {
+      "symbol": "ABFRL", "type": "below", "price": 50,
+      "action": "alert", "message": "ABFRL down 64%+ - consider stop loss"
+    },
+    {
+      "symbol": "OLAELEC", "type": "below", "price": 20,
+      "action": "alert", "message": "Ola Electric down 60%+ - review for further downside risk"
+    },
+    {
+      "symbol": "ZEEL", "type": "below", "price": 60,
+      "action": "alert", "message": "Zee Entertainment down 56%+ - review for exit"
+    },
+    {
+      "symbol": "KFRFASHION", "type": "below", "price": 80,
+      "action": "alert", "message": "Sai Silks down 56%+ - consider stop loss"
+    },
+
+    {
+      "_comment": "=== RECOVERY ALERTS for losers ===",
+      "symbol": "OLAELEC", "type": "above", "price": 40,
+      "action": "alert", "message": "Ola Electric recovering toward buy price - watch momentum"
+    },
+    {
+      "symbol": "ZEEL", "type": "above", "price": 120,
+      "action": "alert", "message": "Zee Entertainment recovering - review if worth holding"
+    },
+    {
+      "symbol": "RENUKA", "type": "above", "price": 35,
+      "action": "alert", "message": "Shree Renuka Sugars recovering - monitor closely"
+    },
+    {
+      "symbol": "EASEMYTRIP", "type": "above", "price": 12,
+      "action": "alert", "message": "EaseMyTrip recovering toward buy price - monitor"
+    },
+    {
+      "symbol": "MANYAVAR", "type": "above", "price": 500,
+      "action": "alert", "message": "Vedant Fashions recovering - review position"
+    },
+
+    {
+      "_comment": "=== NEAR BREAKEVEN - Watch closely ===",
+      "symbol": "INFY", "type": "below", "price": 1200,
+      "action": "buy_signal", "message": "Infosys below ₹1200 - accumulate if fundamentals intact"
+    },
+    {
+      "symbol": "INFY", "type": "above", "price": 1500,
+      "action": "sell_signal", "message": "Infosys crossed ₹1500 - consider partial exit at profit"
+    },
+    {
+      "symbol": "ASIANPAINT", "type": "below", "price": 2100,
+      "action": "buy_signal", "message": "Asian Paints below ₹2100 - potential accumulation zone"
+    },
+    {
+      "symbol": "ASIANPAINT", "type": "above", "price": 3300,
+      "action": "sell_signal", "message": "Asian Paints recovered above buy price - book profit"
+    },
+    {
+      "symbol": "PIIND", "type": "above", "price": 3900,
+      "action": "sell_signal", "message": "PI Industries above buy price - consider exit at profit"
+    },
+    {
+      "symbol": "PAGEIND", "type": "above", "price": 39000,
+      "action": "sell_signal", "message": "Page Industries back above buy price - consider booking"
+    },
+    {
+      "symbol": "BAJAJFINSV", "type": "above", "price": 2000,
+      "action": "sell_signal", "message": "Bajaj Finserv above buy price - consider partial exit"
+    },
+    {
+      "symbol": "ZENTEC", "type": "above", "price": 1600,
+      "action": "sell_signal", "message": "Zen Technologies above buy price with 13% gain - consider partial exit"
+    },
+    {
+      "symbol": "HDFCBANK", "type": "above", "price": 850,
+      "action": "sell_signal", "message": "HDFC Bank at 30%+ gain - consider partial profit booking"
+    },
+    {
+      "symbol": "ADANIENSOL", "type": "above", "price": 1200,
+      "action": "alert", "message": "Adani Energy Solutions back above buy price - review position"
+    },
+    {
+      "symbol": "ADANIENSOL", "type": "below", "price": 850,
+      "action": "alert", "message": "Adani Energy Solutions down 28%+ - consider stop loss"
     }
   ],
+
   "percentChangeTriggers": [
     {
-      "symbol": "ALL",
-      "period": "daily",
-      "changePercent": 5,
-      "direction": "drop",
-      "action": "alert",
-      "message": "dropped more than 5% today"
+      "symbol": "ALL", "period": "daily", "changePercent": 5, "direction": "drop",
+      "action": "alert", "message": "dropped more than 5% today - check for news"
     },
     {
-      "symbol": "ALL",
-      "period": "daily",
-      "changePercent": 5,
-      "direction": "rise",
-      "action": "alert",
-      "message": "rose more than 5% today"
+      "symbol": "ALL", "period": "daily", "changePercent": 5, "direction": "rise",
+      "action": "alert", "message": "rose more than 5% today - potential momentum"
     },
     {
-      "symbol": "ALL",
-      "period": "weekly",
-      "changePercent": 10,
-      "direction": "drop",
-      "action": "buy_signal",
-      "message": "dropped more than 10% this week - potential buying opportunity"
+      "symbol": "ALL", "period": "daily", "changePercent": 10, "direction": "drop",
+      "action": "buy_signal", "message": "crashed 10%+ today - check if panic selling or fundamental issue"
+    },
+    {
+      "symbol": "ALL", "period": "daily", "changePercent": 8, "direction": "rise",
+      "action": "sell_signal", "message": "surged 8%+ today - consider booking if speculative"
     }
   ],
+
   "technicalTriggers": [
     {
-      "symbol": "ALL",
-      "indicator": "RSI",
-      "params": { "period": 14 },
-      "condition": "below",
-      "threshold": 30,
-      "action": "buy_signal",
-      "message": "RSI oversold - potential reversal ahead"
+      "symbol": "ALL", "indicator": "RSI", "params": { "period": 14 },
+      "condition": "below", "threshold": 30,
+      "action": "buy_signal", "message": "RSI oversold (<30) - potential bounce ahead"
     },
     {
-      "symbol": "ALL",
-      "indicator": "RSI",
-      "params": { "period": 14 },
-      "condition": "above",
-      "threshold": 70,
-      "action": "sell_signal",
-      "message": "RSI overbought - consider taking profits"
+      "symbol": "ALL", "indicator": "RSI", "params": { "period": 14 },
+      "condition": "above", "threshold": 70,
+      "action": "sell_signal", "message": "RSI overbought (>70) - consider taking profits"
     },
     {
-      "symbol": "ALL",
-      "indicator": "SMA_CROSSOVER",
+      "symbol": "ALL", "indicator": "SMA_CROSSOVER",
       "params": { "shortPeriod": 20, "longPeriod": 50 },
       "condition": "bullish_crossover",
-      "action": "buy_signal",
-      "message": "Golden crossover (20 SMA crossed above 50 SMA) - bullish signal"
+      "action": "buy_signal", "message": "Golden Cross (20 SMA crossed above 50 SMA) - bullish trend starting"
     },
     {
-      "symbol": "ALL",
-      "indicator": "SMA_CROSSOVER",
+      "symbol": "ALL", "indicator": "SMA_CROSSOVER",
       "params": { "shortPeriod": 20, "longPeriod": 50 },
       "condition": "bearish_crossover",
-      "action": "sell_signal",
-      "message": "Death crossover (20 SMA crossed below 50 SMA) - bearish signal"
+      "action": "sell_signal", "message": "Death Cross (20 SMA crossed below 50 SMA) - bearish trend starting"
     }
   ],
+
   "rebalanceTrigger": {
     "enabled": true,
     "deviationThreshold": 5,
-    "message": "Portfolio weights have drifted beyond threshold - rebalancing suggested"
+    "message": "Portfolio weights have drifted beyond 5% threshold - rebalancing suggested"
   }
 }
