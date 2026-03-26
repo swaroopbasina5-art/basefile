@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node src/index.js",
     "monitor": "node src/monitor.js",
+    "daily": "node src/dailyIntelReport.js",
+    "daily:cron": "node src/dailyIntelReport.js --cron",
     "test": "node test/test.js"
   },
   "dependencies": {

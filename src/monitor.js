@@ -204,12 +204,22 @@ function startMonitor() {
   // Run immediately on start
   runMonitorCycle();
 
-  // Then schedule recurring runs
+  // Then schedule recurring runs (triggers every N minutes)
   cron.schedule(`*/${intervalMinutes} * * * *`, () => {
     runMonitorCycle();
   });
 
-  console.log('Monitor started. Press Ctrl+C to stop.\n');
+  // Daily full intelligence report at 10:00 AM IST
+  const { generateDailyReport } = require('./dailyIntelReport');
+  cron.schedule('0 10 * * *', () => {
+    console.log('\n[DAILY] Running 10 AM intelligence report...');
+    generateDailyReport();
+  }, {
+    timezone: 'Asia/Kolkata',
+  });
+
+  console.log('Monitor started. Press Ctrl+C to stop.');
+  console.log('Daily intelligence report scheduled at 10:00 AM IST.\n');
 }
 
 // Allow running directly or importing
