@@ -1,0 +1,40 @@
+{
+  "name": "My Groww Portfolio",
+  "holdings": [
+    {
+      "symbol": "RELIANCE",
+      "name": "Reliance Industries",
+      "quantity": 10,
+      "avgBuyPrice": 2450.00,
+      "targetWeight": 25
+    },
+    {
+      "symbol": "TCS",
+      "name": "Tata Consultancy Services",
+      "quantity": 5,
+      "avgBuyPrice": 3600.00,
+      "targetWeight": 20
+    },
+    {
+      "symbol": "HDFCBANK",
+      "name": "HDFC Bank",
+      "quantity": 15,
+      "avgBuyPrice": 1650.00,
+      "targetWeight": 20
+    },
+    {
+      "symbol": "INFY",
+      "name": "Infosys",
+      "quantity": 12,
+      "avgBuyPrice": 1480.00,
+      "targetWeight": 15
+    },
+    {
+      "symbol": "ICICIBANK",
+      "name": "ICICI Bank",
+      "quantity": 20,
+      "avgBuyPrice": 950.00,
+      "targetWeight": 20
+    }
+  ]
+}
