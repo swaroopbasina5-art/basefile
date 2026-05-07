@@ -34,7 +34,7 @@ class RetoolDataSync:
     # ------------------------------------------------------------------
 
     # Maximum stores per batch to avoid Retool query timeouts (10s server-side).
-    STORE_BATCH_SIZE = 5
+    STORE_BATCH_SIZE = 2
 
     def fetch_orders(
         self,
