@@ -34,7 +34,7 @@ class RetoolDataSync:
     # ------------------------------------------------------------------
 
     # Maximum stores per batch to avoid Retool query timeouts (10s server-side).
-    STORE_BATCH_SIZE = 10
+    STORE_BATCH_SIZE = 5
 
     def fetch_orders(
         self,
@@ -131,7 +131,13 @@ class RetoolDataSync:
 
                 data = resp.json()
                 if resp.status_code == 400 and data.get("error"):
-                    logger.error("Retool query error (HTTP 400): %s", data.get("message"))
+                    msg = data.get("message", "")
+                    if "timed out" in msg.lower() and attempt < max_retries:
+                        wait = 2 ** (attempt + 1)
+                        logger.warning("Query timeout (attempt %d/%d) – retrying in %ds", attempt + 1, max_retries, wait)
+                        time.sleep(wait)
+                        continue
+                    logger.error("Retool query error (HTTP 400): %s", msg)
                     return []
                 resp.raise_for_status()
 
