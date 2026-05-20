@@ -69,10 +69,17 @@ class RetoolAuth:
         )
         resp2.raise_for_status()
 
-        # Extract tokens from session cookies
+        # Extract tokens from session cookies (handle __Host- prefix variant)
         cookies = self.session.cookies.get_dict()
-        self.access_token = cookies.get("accessToken")
-        self.xsrf_token = cookies.get("xsrfToken")
+        self.access_token = (
+            cookies.get("accessToken")
+            or cookies.get("__Host-accessToken")
+        )
+        self.xsrf_token = (
+            cookies.get("xsrfToken")
+            or cookies.get("__Host-xsrfToken")
+            or cookies.get("__Host-xsrfTokenSameSite")
+        )
 
         if not self.access_token:
             raise RuntimeError(
