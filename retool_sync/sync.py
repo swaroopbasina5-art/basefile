@@ -145,7 +145,7 @@ class RetoolDataSync:
                 logger.info("    → %d rows", len(rows))
                 return rows
 
-            except (requests.ConnectionError, requests.ChunkedEncodingError) as exc:
+            except (requests.ConnectionError, requests.exceptions.ChunkedEncodingError) as exc:
                 if attempt < max_retries:
                     wait = 2 ** (attempt + 1)
                     logger.warning(
