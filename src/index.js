@@ -7,6 +7,7 @@ const { startMonitor, runMonitorCycle } = require('./monitor');
 const { getRainfallForecast } = require('./weatherApi');
 const { assessFloodRisk } = require('./climateTriggerEngine');
 const { startClimateMonitor, runClimateMonitorCycle } = require('./climateMonitor');
+const { syncLocationsToSheet } = require('./googleSheetsService');
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -28,6 +29,7 @@ Commands:
   rainfall <lat> <lon>  Show 12h rainfall forecast & flood risk for a location
   climate-monitor    Start the continuous rainfall/flood trigger monitor
   climate-check      Run a single rainfall/flood trigger check cycle
+  sync-locations-sheet  Push config/climateLocations.json to a Google Sheet
   help               Show this help message
 
 Configuration:
@@ -175,6 +177,24 @@ async function showRainfall(latArg, lonArg) {
   console.log(`  Street flood risk:  ${risk.level.toUpperCase()} - ${risk.reason}`);
 }
 
+async function syncLocationsSheet() {
+  const spreadsheetId = process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
+  if (!spreadsheetId) {
+    console.log('Set GOOGLE_SHEETS_SPREADSHEET_ID in .env first (see README for setup steps).');
+    return;
+  }
+
+  const sheetName = process.env.GOOGLE_SHEETS_LOCATIONS_TAB || 'Climate Locations';
+  const locationsPath = path.resolve(
+    process.env.CLIMATE_LOCATIONS_CONFIG || 'config/climateLocations.json'
+  );
+  const { locations } = JSON.parse(fs.readFileSync(locationsPath, 'utf-8'));
+
+  console.log(`Syncing ${locations.length} location(s) to Google Sheet (tab: "${sheetName}")...`);
+  const count = await syncLocationsToSheet(locations, { spreadsheetId, sheetName });
+  console.log(`Synced ${count} row(s).`);
+}
+
 // Route commands
 (async () => {
   switch (command) {
@@ -201,6 +221,9 @@ async function showRainfall(latArg, lonArg) {
       break;
     case 'climate-check':
       await runClimateMonitorCycle();
+      break;
+    case 'sync-locations-sheet':
+      await syncLocationsSheet();
       break;
     default:
       printUsage();

@@ -62,7 +62,30 @@ npm run climate-monitor
 
 # Run a single rainfall/flood-risk check cycle
 npm start climate-check
+
+# Push config/climateLocations.json to a Google Sheet
+npm start sync-locations-sheet
 ```
+
+### Google Sheets Setup
+
+`sync-locations-sheet` pushes your climate locations list to a Google Sheet via a
+service account (no OAuth login flow, no manual export/import).
+
+1. In [Google Cloud Console](https://console.cloud.google.com/), create/select a project
+   and enable the **Google Sheets API**.
+2. Create a **Service Account** (IAM & Admin → Service Accounts), then create a JSON key
+   for it and download it.
+3. Save the key file somewhere outside version control, e.g. `secrets/service-account.json`
+   (already gitignored).
+4. Create a Google Sheet and copy its ID from the URL:
+   `https://docs.google.com/spreadsheets/d/<SPREADSHEET_ID>/edit`
+5. Share that Sheet with the service account's email (the `client_email` field in the
+   JSON key) with **Editor** access.
+6. Set in `.env`: `GOOGLE_SERVICE_ACCOUNT_KEY_FILE`, `GOOGLE_SHEETS_SPREADSHEET_ID`, and
+   optionally `GOOGLE_SHEETS_LOCATIONS_TAB` (defaults to "Climate Locations").
+7. Run `npm start sync-locations-sheet` any time the location list changes - it creates
+   the tab if needed and overwrites its contents with the current location list.
 
 ## Configuration
 
