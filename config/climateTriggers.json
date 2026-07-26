@@ -1,0 +1,40 @@
+{
+  "rainfallTriggers": [
+    {
+      "location": "ALL",
+      "type": "total_exceeds",
+      "thresholdMm": 50,
+      "action": "flood_alert",
+      "message": "50mm+ of rain expected in the next 12 hours - flood risk"
+    },
+    {
+      "location": "ALL",
+      "type": "intensity_exceeds",
+      "thresholdMm": 10,
+      "action": "flash_flood_alert",
+      "message": "Cloudburst-level rain intensity (10mm+/hr) expected - flash flood risk"
+    },
+    {
+      "location": "ALL",
+      "type": "probability_exceeds",
+      "thresholdPercent": 80,
+      "action": "advisory",
+      "message": "High probability of rain in the next 12 hours - plan accordingly"
+    },
+    {
+      "location": "ALL",
+      "type": "consecutive_wet_hours",
+      "thresholdHours": 6,
+      "action": "advisory",
+      "message": "6+ consecutive hours of rain expected - prolonged rainfall event"
+    }
+  ],
+  "floodRiskTriggers": [
+    {
+      "location": "ALL",
+      "minLevel": "moderate",
+      "action": "street_flooding_alert",
+      "message": "Street/urban flooding possible - drainage may be overwhelmed"
+    }
+  ]
+}

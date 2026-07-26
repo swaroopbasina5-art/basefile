@@ -4,6 +4,9 @@ const path = require('path');
 const { getStockQuote, getMultipleQuotes, getHistoricalData } = require('./growwApi');
 const { analyzeStock } = require('./technicalAnalysis');
 const { startMonitor, runMonitorCycle } = require('./monitor');
+const { getRainfallForecast } = require('./weatherApi');
+const { assessFloodRisk } = require('./climateTriggerEngine');
+const { startClimateMonitor, runClimateMonitorCycle } = require('./climateMonitor');
 
 const args = process.argv.slice(2);
 const command = args[0];
@@ -17,23 +20,30 @@ Usage:
   node src/index.js <command>
 
 Commands:
-  monitor       Start the continuous monitoring daemon
-  check         Run a single check cycle (useful for testing)
-  quote <SYM>   Get live quote for a stock symbol
-  analyze <SYM> Run technical analysis on a stock
-  portfolio     Show current portfolio status
-  help          Show this help message
+  monitor            Start the continuous monitoring daemon
+  check              Run a single check cycle (useful for testing)
+  quote <SYM>        Get live quote for a stock symbol
+  analyze <SYM>      Run technical analysis on a stock
+  portfolio          Show current portfolio status
+  rainfall <lat> <lon>  Show 12h rainfall forecast & flood risk for a location
+  climate-monitor    Start the continuous rainfall/flood trigger monitor
+  climate-check      Run a single rainfall/flood trigger check cycle
+  help               Show this help message
 
 Configuration:
-  Edit config/portfolio.json  - Your portfolio holdings & target weights
-  Edit config/triggers.json   - Price, % change, and technical triggers
-  Copy .env.example to .env   - Gmail credentials and settings
+  Edit config/portfolio.json        - Your portfolio holdings & target weights
+  Edit config/triggers.json         - Price, % change, and technical triggers
+  Edit config/climateLocations.json - Lat/long locations to monitor for rainfall
+  Edit config/climateTriggers.json  - Rainfall and flood risk trigger rules
+  Copy .env.example to .env         - Gmail credentials and settings
 
 Examples:
   node src/index.js monitor
   node src/index.js quote RELIANCE
   node src/index.js analyze TCS
   node src/index.js portfolio
+  node src/index.js rainfall 19.0760 72.8777
+  node src/index.js climate-monitor
 `);
 }
 
@@ -139,6 +149,32 @@ async function showPortfolio() {
   console.log(`  Total P&L:      ${totalPnl >= 0 ? '+' : ''}₹${totalPnl.toFixed(0)} (${((totalPnl / totalInvested) * 100).toFixed(1)}%)`);
 }
 
+async function showRainfall(latArg, lonArg) {
+  const lat = parseFloat(latArg);
+  const lon = parseFloat(lonArg);
+  if (Number.isNaN(lat) || Number.isNaN(lon)) {
+    console.log('Usage: node src/index.js rainfall <lat> <lon>');
+    return;
+  }
+
+  console.log(`Fetching 12h rainfall forecast for (${lat}, ${lon})...`);
+  const forecast = await getRainfallForecast(lat, lon, 12);
+  const risk = assessFloodRisk(forecast.summary);
+
+  console.log(`\nRainfall Forecast - Next ${forecast.windowHours}h (${forecast.timezone})`);
+  console.log('─'.repeat(50));
+  forecast.hourly.forEach((h) => {
+    const time = new Date(h.time).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    console.log(`  ${time}  ${String(h.precipitationMm).padStart(5)}mm  (${h.precipitationProbability}% chance)`);
+  });
+  console.log('─'.repeat(50));
+  console.log(`  Total:              ${forecast.summary.totalMm}mm`);
+  console.log(`  Peak intensity:     ${forecast.summary.maxHourlyMm}mm/hr`);
+  console.log(`  Max probability:    ${forecast.summary.maxProbability}%`);
+  console.log(`  Consecutive wet hrs:${String(forecast.summary.maxConsecutiveWetHours).padStart(3)}`);
+  console.log(`  Street flood risk:  ${risk.level.toUpperCase()} - ${risk.reason}`);
+}
+
 // Route commands
 (async () => {
   switch (command) {
@@ -156,6 +192,15 @@ async function showPortfolio() {
       break;
     case 'portfolio':
       await showPortfolio();
+      break;
+    case 'rainfall':
+      await showRainfall(args[1], args[2]);
+      break;
+    case 'climate-monitor':
+      startClimateMonitor();
+      break;
+    case 'climate-check':
+      await runClimateMonitorCycle();
       break;
     default:
       printUsage();

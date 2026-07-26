@@ -6,10 +6,11 @@
   "scripts": {
     "start": "node src/index.js",
     "monitor": "node src/monitor.js",
+    "climate-monitor": "node src/climateMonitor.js",
     "test": "node test/test.js"
   },
   "dependencies": {
-    "axios": "^1.6.0",
+    "axios": "^1.18.1",
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.0",
     "dotenv": "^16.3.0",

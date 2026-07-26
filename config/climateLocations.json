@@ -1,0 +1,29 @@
+{
+  "locations": [
+    { "name": "Hengrabari S.O", "pincode": "781036", "distanceKm": 1.3, "lat": 26.1509131, "lon": 91.8055759 },
+    { "name": "Patharquerry S.O", "pincode": "781171", "distanceKm": 7, "lat": 26.1687403, "lon": 91.7718718 },
+    { "name": "Amsinggaon E (S 85) B.O", "pincode": "781027", "distanceKm": 8.2, "lat": 26.1478609, "lon": 91.8299881 },
+    { "name": "Panjabari S.O", "pincode": "781037", "distanceKm": 3.2, "lat": 26.1339000, "lon": 91.8297945 },
+    { "name": "Jorabat SO", "pincode": "781033", "distanceKm": 10.1, "lat": 26.1371638, "lon": 91.6820443 },
+    { "name": "Khanapara S.O", "pincode": "781022", "distanceKm": 3.5, "lat": 26.1306890, "lon": 91.8087194 },
+    { "name": "Pillangkata B.O", "pincode": "781029", "distanceKm": 10.7, "lat": 26.1010316, "lon": 91.7826402 },
+    { "name": "Beltola S.O", "pincode": "781028", "distanceKm": 4.1, "lat": 26.1275219, "lon": 91.7971388 },
+    { "name": "Hatigaon Chariali S.O", "pincode": "781038", "distanceKm": 4, "lat": 26.1291441, "lon": 91.7794577 },
+    { "name": "Sawkuchi S.O", "pincode": "781040", "distanceKm": 11.8, "lat": 26.1035814, "lon": 91.7505109 },
+    { "name": "Amerigog S.O", "pincode": "781023", "distanceKm": 38.9, "lat": 26.1297991, "lon": 91.8301975 },
+    { "name": "Indrapur S.O", "pincode": "781032", "distanceKm": 5.8, "lat": 26.1576747, "lon": 91.7587321 },
+    { "name": "Gopinathnagar S.O", "pincode": "781016", "distanceKm": 7.4, "lat": 26.1643025, "lon": 91.7464755 },
+    { "name": "Kahilipara S.O", "pincode": "781019", "distanceKm": 5.5, "lat": 26.1366514, "lon": 91.7635361 },
+    { "name": "Odalbakra S.O", "pincode": "781034", "distanceKm": 9.2, "lat": 26.1410501, "lon": 91.7515521 },
+    { "name": "Binovanagar S.O", "pincode": "781018", "distanceKm": 9.4, "lat": 26.1341100, "lon": 91.7085940 },
+    { "name": "Rehabari S.O", "pincode": "781008", "distanceKm": 7.6, "lat": 26.1734959, "lon": 91.7487024 },
+    { "name": "Assam Sachivalaya S.O", "pincode": "781006", "distanceKm": 9.3, "lat": 26.1464891, "lon": 91.7894222 },
+    { "name": "Japorigog B.O", "pincode": "781005", "distanceKm": 2.9, "lat": 26.1603078, "lon": 91.7754097 },
+    { "name": "Zoo Road S.O", "pincode": "781024", "distanceKm": 4.5, "lat": 26.1703571, "lon": 91.7805594 },
+    { "name": "Lachitnagar S.O", "pincode": "781007", "distanceKm": 6, "lat": 26.1718278, "lon": 91.7627354 },
+    { "name": "Bamunimaidan S.O", "pincode": "781021", "distanceKm": 8.3, "lat": 26.1854106, "lon": 91.7883869 },
+    { "name": "Assam Tribune S.O", "pincode": "781003", "distanceKm": 9.1, "lat": 26.1816389, "lon": 91.7689462 },
+    { "name": "Uzanbazar S.O", "pincode": "781001", "distanceKm": 9, "lat": 26.1757025, "lon": 91.7487101 },
+    { "name": "Kharguli S.O", "pincode": "781004", "distanceKm": 9.7, "lat": 26.1899973, "lon": 91.7617997 }
+  ]
+}

@@ -200,10 +200,102 @@ function formatRebalanceEmail(suggestions) {
     </div>`;
 }
 
+const FLOOD_RISK_COLORS = {
+  minimal: '#16a34a',
+  low: '#65a30d',
+  moderate: '#d97706',
+  high: '#ea580c',
+  severe: '#dc2626',
+};
+
+/**
+ * Format rainfall trigger alert as HTML email
+ */
+function formatRainfallEmail(alerts) {
+  const rows = alerts
+    .map((a) => {
+      const riskColor = FLOOD_RISK_COLORS[a.floodRisk?.level] || '#6b7280';
+      return `
+      <tr>
+        <td style="padding:8px;border:1px solid #ddd;">${a.location}</td>
+        <td style="padding:8px;border:1px solid #ddd;">${a.summary.totalMm}mm</td>
+        <td style="padding:8px;border:1px solid #ddd;">${a.summary.maxHourlyMm}mm/hr</td>
+        <td style="padding:8px;border:1px solid #ddd;color:${riskColor};font-weight:bold;">
+          ${(a.floodRisk?.level || 'unknown').toUpperCase()}
+        </td>
+        <td style="padding:8px;border:1px solid #ddd;">${a.message}</td>
+      </tr>`;
+    })
+    .join('');
+
+  return `
+    <div style="font-family:Arial,sans-serif;max-width:640px;">
+      <h2 style="color:#1e40af;">🌧️ Rainfall Trigger Alert (Next 12 Hours)</h2>
+      <p>The following locations have crossed configured rainfall thresholds:</p>
+      <table style="border-collapse:collapse;width:100%;">
+        <thead>
+          <tr style="background:#f1f5f9;">
+            <th style="padding:8px;border:1px solid #ddd;">Location</th>
+            <th style="padding:8px;border:1px solid #ddd;">12h Total</th>
+            <th style="padding:8px;border:1px solid #ddd;">Peak Intensity</th>
+            <th style="padding:8px;border:1px solid #ddd;">Flood Risk</th>
+            <th style="padding:8px;border:1px solid #ddd;">Note</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <p style="color:#6b7280;font-size:12px;margin-top:16px;">
+        Generated at ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST
+      </p>
+    </div>`;
+}
+
+/**
+ * Format street/urban flood risk alert as HTML email
+ */
+function formatFloodRiskEmail(alerts) {
+  const rows = alerts
+    .map((a) => {
+      const riskColor = FLOOD_RISK_COLORS[a.floodRisk?.level] || '#6b7280';
+      return `
+      <tr>
+        <td style="padding:8px;border:1px solid #ddd;">${a.location}</td>
+        <td style="padding:8px;border:1px solid #ddd;color:${riskColor};font-weight:bold;">
+          ${a.floodRisk.level.toUpperCase()}
+        </td>
+        <td style="padding:8px;border:1px solid #ddd;">${a.floodRisk.reason}</td>
+        <td style="padding:8px;border:1px solid #ddd;">${a.summary.totalMm}mm / ${a.summary.maxHourlyMm}mm/hr</td>
+      </tr>`;
+    })
+    .join('');
+
+  return `
+    <div style="font-family:Arial,sans-serif;max-width:640px;">
+      <h2 style="color:#dc2626;">🌊 Street Flooding Risk Alert</h2>
+      <p>Rainfall forecasts indicate possible street/urban flooding in the next 12 hours:</p>
+      <table style="border-collapse:collapse;width:100%;">
+        <thead>
+          <tr style="background:#f1f5f9;">
+            <th style="padding:8px;border:1px solid #ddd;">Location</th>
+            <th style="padding:8px;border:1px solid #ddd;">Risk Level</th>
+            <th style="padding:8px;border:1px solid #ddd;">Reason</th>
+            <th style="padding:8px;border:1px solid #ddd;">12h Total / Peak</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <p style="color:#6b7280;font-size:12px;margin-top:16px;">
+        Generated at ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST
+      </p>
+    </div>`;
+}
+
 module.exports = {
   sendAlert,
   formatPriceTriggerEmail,
   formatPercentChangeEmail,
   formatTechnicalEmail,
   formatRebalanceEmail,
+  formatRainfallEmail,
+  formatFloodRiskEmail,
 };
