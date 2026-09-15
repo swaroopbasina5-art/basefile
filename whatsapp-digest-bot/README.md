@@ -9,8 +9,12 @@ groups that chat in English, Hindi, or Hinglish.
 - This runs as a small program that logs into WhatsApp the same way
   **WhatsApp Web** does — by scanning a QR code once with your phone. It does
   not use a separate bot number; it mirrors your own account.
-- It needs to stay running all the time to keep that connection alive, so it
-  lives on a small always-on cloud server (a "VPS"), not your laptop.
+- It needs to stay running all the time to keep that connection alive. You're
+  running it on your own Mac, so **your Mac needs to stay on, awake, and
+  connected to the internet** for the automatic daily digest to fire (see the
+  "Keep your Mac awake" note below). If it's asleep at digest time, no digest
+  goes out until it wakes — but on-demand (`/digest`) still works any time
+  it's running.
 - Every night (9 PM by default) it reads what's new in each of your groups,
   asks Claude (Anthropic's AI) to write a short summary of each one, and
   sends you a single WhatsApp message — to yourself — with all of them
@@ -27,63 +31,65 @@ don't be surprised if you occasionally need to re-scan the QR code.
 
 ## What you need before you start
 
-1. **A small cloud server (VPS).** Recommended: [DigitalOcean](https://www.digitalocean.com/)
-   or [Oracle Cloud Free Tier](https://www.oracle.com/cloud/free/). A
-   $4-6/month "Ubuntu 22.04" droplet is plenty. (If you'd like, I can walk
-   you through creating one.)
+1. **Your Mac**, plugged in and staying awake while the bot runs (see below).
 2. **An Anthropic API key** — this pays for the AI that writes your
    summaries. Get one at https://console.anthropic.com/ (Settings > API
    Keys). Cost for a daily digest of a handful of groups is typically a few
    cents a month.
 3. **Your phone with WhatsApp installed**, to scan a QR code once.
 
-## Setup steps
+## Setup steps (on your Mac)
 
-Do these by SSH-ing into your VPS (your provider's dashboard has a "Console"
-or gives you an IP address + password/key to connect with).
+Open the **Terminal** app (press `Cmd+Space`, type "Terminal", hit Enter).
+Every command below gets typed into that window.
 
-**1. Install Node.js** (one-time, on a fresh Ubuntu server):
+**1. Install Node.js** (one-time). Easiest way is via Homebrew:
 ```bash
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt-get install -y nodejs git
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+brew install node git
 ```
+(If Homebrew is new to you: paste the first command, press Enter, and follow
+any on-screen prompts — it may ask for your Mac password.) If you'd rather
+avoid Homebrew, you can instead download the Node.js installer directly from
+https://nodejs.org (choose the "LTS" version) and run it like any Mac app.
 
-**2. Get the code onto the server:**
+**2. Get the code onto your Mac:**
 ```bash
+cd ~
 git clone https://github.com/swaroopbasina5-art/basefile.git
 cd basefile/whatsapp-digest-bot
 ```
+(The first time you run `git`, macOS may prompt you to install "Command
+Line Developer Tools" — click Install and wait for it to finish, then
+re-run the command above.)
 
 **3. Install dependencies:**
 ```bash
 npm install
 ```
-whatsapp-web.js also needs a browser (Chromium) to run — if `npm install`
-doesn't pull it in automatically, run:
-```bash
-sudo apt-get install -y chromium-browser
-```
+This also downloads a private copy of Chromium (the browser whatsapp-web.js
+drives) automatically — no extra step needed on Mac.
 
 **4. Configure it:**
 ```bash
 cp .env.example .env
-nano .env
+open -e .env
 ```
-Paste in your `ANTHROPIC_API_KEY`. Leave everything else as default to
-start (daily digest at 9 PM IST, trigger word `/digest`). Save with
-`Ctrl+O`, `Enter`, then exit with `Ctrl+X`.
+That opens the file in TextEdit. Paste in your `ANTHROPIC_API_KEY`, save
+(`Cmd+S`), and close the window. Leave everything else as default to start
+(daily digest at 9 PM IST, trigger word `/digest`).
 
 Optional: only want specific groups summarized instead of all of them?
 ```bash
 cp config/groups.json.example config/groups.json
-nano config/groups.json
+open -e config/groups.json
 ```
-List the exact group names you want included. Delete `config/groups.json`
-(or leave it uncreated) to include every group.
+List the exact group names you want included, save, and close. Delete
+`config/groups.json` (or leave it uncreated) to include every group.
 
-**5. Keep it running permanently with pm2:**
+**5. Keep it running with pm2** (so it survives closing the Terminal window):
 ```bash
-sudo npm install -g pm2
+npm install -g pm2
 pm2 start src/index.js --name whatsapp-digest
 ```
 
@@ -96,13 +102,34 @@ A QR code will appear in the terminal. On your phone: **WhatsApp > Settings
 `WhatsApp client ready.` in the logs, press `Ctrl+C` to stop watching the
 logs (the bot keeps running in the background).
 
-**7. Make it survive server reboots:**
+**7. Make it survive a Mac restart:**
 ```bash
 pm2 save
 pm2 startup
 ```
-(This last command prints another command — copy-paste and run that one
-too, it's a one-time setup step.)
+This prints another command tailored to your Mac — copy-paste and run that
+one too, it's a one-time setup step (it may ask for your password).
+
+## Keep your Mac awake
+
+Since the bot runs locally, the automatic 9 PM digest only fires if your
+Mac is on and awake at that time. Easiest fix — open **System Settings >
+Lock Screen**, and set "Turn display off" options so the Mac doesn't fully
+sleep (closing the lid still sleeps it, so keep it open and plugged in, or
+use an external display). Alternatively, run this once per session to keep
+it awake in the background without changing your system settings:
+```bash
+caffeinate -s &
+```
+On-demand digests (`/digest`) work fine any time the bot is running — it's
+only the scheduled 9 PM one that needs the Mac awake at that exact time.
+
+## Moving to a cloud server later
+
+If you'd rather this run 24/7 without depending on your Mac being on, the
+same code works unchanged on a small Linux VPS (e.g. DigitalOcean). Just
+ask and I'll give you the equivalent Linux setup steps — the `.env` and
+`config/groups.json` you've already set up carry over as-is.
 
 ## Try it
 
