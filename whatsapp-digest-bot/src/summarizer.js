@@ -1,5 +1,3 @@
-const Anthropic = require('@anthropic-ai/sdk');
-
 const MAX_CHARS_PER_GROUP = 12000;
 
 function buildPrompt(groupTranscripts) {
@@ -27,22 +25,50 @@ Rules:
 - Keep the whole thing scannable on a phone screen. No preamble, no closing remarks — just the group sections back to back.`;
 }
 
-async function summarizeGroups(groupTranscripts, { apiKey, model }) {
-  const nonEmpty = groupTranscripts.filter((g) => g.lines.length > 0);
-  if (nonEmpty.length === 0) return null;
+async function summarizeWithOllama(prompt, { baseUrl, model }) {
+  const res = await fetch(`${baseUrl}/api/generate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model, prompt, stream: false }),
+  });
 
+  if (!res.ok) {
+    const detail = await res.text().catch(() => '');
+    throw new Error(
+      `Ollama request failed (${res.status}). Is "ollama serve" running and have you run "ollama pull ${model}"? ${detail}`
+    );
+  }
+
+  const data = await res.json();
+  return data.response;
+}
+
+async function summarizeWithAnthropic(prompt, { apiKey, model }) {
+  const Anthropic = require('@anthropic-ai/sdk');
   const client = new Anthropic({ apiKey });
 
   const response = await client.messages.create({
     model,
     max_tokens: 2000,
-    messages: [{ role: 'user', content: buildPrompt(nonEmpty) }],
+    messages: [{ role: 'user', content: prompt }],
   });
 
   return response.content
     .filter((block) => block.type === 'text')
     .map((block) => block.text)
     .join('\n');
+}
+
+async function summarizeGroups(groupTranscripts, options) {
+  const nonEmpty = groupTranscripts.filter((g) => g.lines.length > 0);
+  if (nonEmpty.length === 0) return null;
+
+  const prompt = buildPrompt(nonEmpty);
+
+  if (options.provider === 'anthropic') {
+    return summarizeWithAnthropic(prompt, options);
+  }
+  return summarizeWithOllama(prompt, options);
 }
 
 module.exports = { summarizeGroups };

@@ -44,16 +44,31 @@ async function runDigest(client, { silent = false } = {}) {
 
   console.log(`Summarizing ${totalNewMessages} new messages across ${results.length} groups...`);
 
-  const summary = await summarizeGroups(results, {
-    apiKey: process.env.ANTHROPIC_API_KEY,
-    model: process.env.ANTHROPIC_MODEL || 'claude-haiku-4-5-20251001',
-  });
+  const summary = await summarizeGroups(results, getSummarizerOptions());
 
   const digestText = `📋 *Group Digest* - ${formatDateHeader()}\n\n${summary}`;
   await sendToSelf(client, digestText);
 
   results.forEach((r) => setLastRunTimestamp(r.groupId, r.latestTimestamp));
   console.log('Digest sent.');
+}
+
+function getSummarizerOptions() {
+  const provider = (process.env.SUMMARIZER_PROVIDER || 'ollama').toLowerCase();
+
+  if (provider === 'anthropic') {
+    return {
+      provider,
+      apiKey: process.env.ANTHROPIC_API_KEY,
+      model: process.env.ANTHROPIC_MODEL || 'claude-haiku-4-5-20251001',
+    };
+  }
+
+  return {
+    provider: 'ollama',
+    baseUrl: process.env.OLLAMA_BASE_URL || 'http://localhost:11434',
+    model: process.env.OLLAMA_MODEL || 'llama3.2',
+  };
 }
 
 async function sendToSelf(client, text) {
