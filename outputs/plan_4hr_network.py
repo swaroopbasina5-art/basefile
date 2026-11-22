@@ -157,7 +157,7 @@ with pd.ExcelWriter(f"{OUT}/NCR_4hr_network_plan.xlsx", engine="openpyxl") as xw
 pal = ["#e6194b", "#3cb44b", "#4363d8", "#f58231", "#911eb4", "#42d4f4", "#f032e6", "#9a6324",
        "#469990", "#800000", "#808000", "#000075", "#bfef45", "#ff7f50", "#2f4f4f", "#dc143c",
        "#8b4513", "#6a5acd", "#008080", "#b8860b"]
-m = folium.Map(location=[lat.mean(), lng.mean()], zoom_start=10, tiles="cartodbpositron")
+m = folium.Map(location=[lat.mean(), lng.mean()], zoom_start=10, tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}", attr="Tiles &copy; Esri")
 qmin, qmax = w.min(), w.max()
 for n, h in H.iterrows():
     col = pal[n % len(pal)]
